@@ -26,7 +26,7 @@ namespace ZXMAK2.Hardware.General
         private IconDescriptor m_iconWr = new IconDescriptor("FDDWR", ResourceImages.OsdFddWr);
         protected CpuUnit m_cpu;
         protected IMemoryDevice m_memory;
-        protected Wd1793 m_wd = new Wd1793();
+        protected readonly Wd1793BetadiskWrapper m_wd = new Wd1793BetadiskWrapper();
 
         private IViewHolder m_viewHolder;
 

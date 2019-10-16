@@ -22,7 +22,7 @@ namespace ZXMAK2.Hardware.Sprinter
         private bool _sandbox = false;
         private CpuUnit _cpu;
         private IMemoryDevice _memory;
-        private Wd1793 _wd = new Wd1793(2);
+        private Wd1793BetadiskWrapper _wd = new Wd1793BetadiskWrapper(2);
 
         private byte _isBdiMode;
         
