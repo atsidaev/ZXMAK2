@@ -17,7 +17,7 @@ using ZXMAK2.Resources;
 
 namespace ZXMAK2.Hardware.General
 {
-    public class FddController : BusDeviceBase, IBetaDiskDevice
+    public abstract class FddController : BusDeviceBase, IBetaDiskDevice
     {
         #region Fields
 
@@ -26,18 +26,19 @@ namespace ZXMAK2.Hardware.General
         private IconDescriptor m_iconWr = new IconDescriptor("FDDWR", ResourceImages.OsdFddWr);
         protected CpuUnit m_cpu;
         protected IMemoryDevice m_memory;
-        protected readonly Wd1793BetadiskWrapper m_wd = new Wd1793BetadiskWrapper();
+        protected readonly IWd1793Wrapper m_wd;
 
         private IViewHolder m_viewHolder;
 
         #endregion
 
-
-        public FddController()
+        public FddController(IWd1793Wrapper wd1793Wrapper)
         {
             Category = BusDeviceCategory.Disk;
             Name = "FDD WD1793";
             Description = "FDD controller WD1793\r\nBDI-ports compatible\r\nPorts active when DOSEN=1 or SYSEN=1";
+
+            m_wd = wd1793Wrapper;
 
             LoadManagers = new ISerializeManager[m_wd.FDD.Length];
             for (var i = 0; i < LoadManagers.Length; i++)
@@ -47,6 +48,9 @@ namespace ZXMAK2.Hardware.General
             CreateViewHolder();
         }
 
+        protected FddController() : this(new Wd1793BetadiskWrapper())
+        {
+        }
 
         public ISerializeManager[] LoadManagers { get; private set; }
         

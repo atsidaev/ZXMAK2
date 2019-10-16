@@ -78,7 +78,7 @@ namespace ZXMAK2.Hardware.Circuits.Fdd
 
         public bool HLT
         {
-            get => _hlt;
+            get { return _hlt; }
             set
             {
                 if (_hlt != value && value && (status & WD_STATUS.WDS_BUSY) == 0)

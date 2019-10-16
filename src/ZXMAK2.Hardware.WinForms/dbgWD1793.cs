@@ -9,18 +9,18 @@ namespace ZXMAK2.Hardware.WinForms
 {
     public partial class dbgWD1793 : FormView, IFddDebugView
     {
-        private Wd1793 _wd1793;
+        private IWd1793Wrapper _wd;
 
-        public dbgWD1793(Wd1793 debugTarget)
+        public dbgWD1793(IWd1793Wrapper debugTarget)
         {
-            _wd1793 = debugTarget;
+            _wd = debugTarget;
             InitializeComponent();
         }
 
         private void timerUpdate_Tick(object sender, EventArgs e)
         {
-            if (_wd1793 != null)
-                label1.Text = _wd1793.DumpState();
+            if (_wd != null)
+                label1.Text = _wd.DumpState();
             else
                 label1.Text = "Beta Disk interface not found";
         }

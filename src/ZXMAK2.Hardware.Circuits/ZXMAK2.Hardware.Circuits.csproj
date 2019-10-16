@@ -53,6 +53,9 @@
     <Compile Include="Ata\Enums.cs" />
     <Compile Include="Ata\PhysicalDeviceInfo.cs" />
     <Compile Include="Fdd\Enums.cs" />
+    <Compile Include="Fdd\IWd1793Wrapper.cs" />
+    <Compile Include="Fdd\Wd1793BetadiskWrapper.cs" />
+    <Compile Include="Fdd\Wd1793GenericWrapper.cs" />
     <Compile Include="NvramChip.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RtcChip.cs" />

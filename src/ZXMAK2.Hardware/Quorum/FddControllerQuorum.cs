@@ -8,44 +8,97 @@ namespace ZXMAK2.Hardware.Quorum
 {
     public class FddControllerQuorum : FddController
     {
-        #region Fields
+        public class Wd1793QuorumWrapper : Wd1793GenericWrapper
+        {
+            #region Fields
 
-        private static readonly int[] s_drvDecode = new int[] { 3, 0, 1, 3 };
+            private static readonly int[] s_drvDecode = new int[] { 3, 0, 1, 3 };
 
-        #endregion
+            #endregion
 
 
-        public FddControllerQuorum()
+            public Wd1793QuorumWrapper() : base(4)
+            {
+            }
+
+            protected override void WriteRegister(long tact, WD93REG reg, byte value)
+            {
+                switch (reg)
+                {
+                    case WD93REG.CMD:
+                    case WD93REG.TRK:
+                    case WD93REG.SEC:
+                    case WD93REG.DAT:
+                        Wd.Write(tact, reg, value);
+                        break;
+
+                    case WD93REG.SYS:
+                        LedRd = true;
+
+                        // D0 selects first drive, D1 - second, D2 and D3 are reserved
+                        var drv = s_drvDecode[value & 3];
+                        drv = (byte)(((value & ~3) ^ 0x10) | drv);
+
+                        Drive = (drv & 3) % FDD.Length;
+                        Side = 1 & ~(drv >> 4);
+
+                        Wd.FDD = FDD[Drive];
+                        FDD[Drive].HeadSide = Side;
+                        FDD[Drive].t = FDD[Drive].CurrentTrack;
+
+                        System = value;
+                        break;
+                }
+            }
+
+            protected override byte ReadRegister(long tact, WD93REG reg)
+            {
+                byte value = 0xFF;
+                switch (reg)
+                {
+                    case WD93REG.CMD:
+                    case WD93REG.TRK:
+                    case WD93REG.SEC:
+                    case WD93REG.DAT:
+                        LedRd = true;
+                        value = Wd.Read(tact, reg);
+                        break;
+                }
+                
+                return value;
+            }
+        }
+
+        public FddControllerQuorum() : base(new Wd1793QuorumWrapper())
         {
             Name = "FDD QUORUM";
             Description = "FDD controller WD1793 with QUORUM port activation";
         }
-
         
         #region BetaDiskInterface
 
         protected override void OnSubscribeIo(IBusManager bmgr)
         {
-            // mask - #9F
+            // mask - #9C
             // #80 - CMD
             // #81 - TRK
             // #82 - SEC
             // #83 - DAT
-            // #85 - SYS
+            // #84, #85 - SYS (#85 in documentation, but some system programs use #84)
             bmgr.Events.SubscribeWrIo(0x9C, 0x80 & 0x9C, BusWriteFdc);
             bmgr.Events.SubscribeRdIo(0x9C, 0x80 & 0x9C, BusReadFdc);
-            bmgr.Events.SubscribeWrIo(0x9F, 0x85 & 0x9F, BusWriteSys);
-            bmgr.Events.SubscribeRdIo(0x9F, 0x85 & 0x9F, BusReadSys);
+            bmgr.Events.SubscribeWrIo(0x9C, 0x84 & 0x9E, BusWriteSys);
+            bmgr.Events.SubscribeRdIo(0x9C, 0x84 & 0x9E, BusReadSys);
+            bmgr.Events.SubscribeReset(BusReset);
         }
 
-        public override bool IsActive
+        private void BusReset()
         {
-            get 
-            {
-                return true;//m_memory.CMR1 & 0x80; // Q_TR_DOS
-            }
+            m_wd.Wd1793.Reset();
         }
 
+        public override bool IsActive => true;
+        
         protected override void BusWriteFdc(ushort addr, byte value, ref bool handled)
         {
             if (handled || !IsActive)
@@ -80,13 +133,11 @@ namespace ZXMAK2.Hardware.Quorum
                 return;
             handled = true;
 
-            var drv = s_drvDecode[value & 3];
-            drv = ((value & ~3) ^ 0x10) | drv;
             if (LogIo)
             {
-                LogIoWrite(m_cpu.Tact, WD93REG.SYS, (byte)drv);
+                LogIoWrite(m_cpu.Tact, WD93REG.SYS, value);
             }
-            m_wd.Write(m_cpu.Tact, WD93REG.SYS, (byte)drv);
+            m_wd.Write(m_cpu.Tact, WD93REG.SYS, value);
         }
 
         protected override void BusReadSys(ushort addr, ref byte value, ref bool handled)
