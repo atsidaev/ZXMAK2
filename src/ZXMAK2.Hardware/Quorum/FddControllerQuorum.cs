@@ -2,22 +2,19 @@
 using ZXMAK2.Engine.Interfaces;
 using ZXMAK2.Hardware.General;
 using ZXMAK2.Hardware.Circuits.Fdd;
+using ZXMAK2.Model.Disk;
 
 
 namespace ZXMAK2.Hardware.Quorum
 {
     public class FddControllerQuorum : FddController
     {
+        #region Wd1793QuorumWrapper
         public class Wd1793QuorumWrapper : Wd1793GenericWrapper
         {
-            #region Fields
+            private DiskImage _noDisk = new DiskImage();
 
-            private static readonly int[] s_drvDecode = new int[] { 3, 0, 1, 3 };
-
-            #endregion
-
-
-            public Wd1793QuorumWrapper() : base(4)
+            public Wd1793QuorumWrapper() : base(2)
             {
             }
 
@@ -35,16 +32,29 @@ namespace ZXMAK2.Hardware.Quorum
                     case WD93REG.SYS:
                         LedRd = true;
 
-                        // D0 selects first drive, D1 - second, D2 and D3 are reserved
-                        var drv = s_drvDecode[value & 3];
-                        drv = (byte)(((value & ~3) ^ 0x10) | drv);
+                        // D0 selects first drive, D1 - second, D2 and D3 are reserved for third and fourth.
+                        // This means that we should check if any drive is selected at all, and also remap this bit set to a Drive index.
+                        var selectedDrive = value & 0x7;
+                        if (selectedDrive == 0x01)
+                            Drive = 0;
+                        else if (selectedDrive == 0x02)
+                            Drive = 1;
+                        else
+                            Drive = -1; // If no drive is selected, or the reserved D2 and D3 bits are used, then do not connect any floppy disk to WD1793
 
-                        Drive = (drv & 3) % FDD.Length;
-                        Side = 1 & ~(drv >> 4);
+                        Side = (value >> 4) & 0x01;
 
-                        Wd.FDD = FDD[Drive];
-                        FDD[Drive].HeadSide = Side;
-                        FDD[Drive].t = FDD[Drive].CurrentTrack;
+                        if (Drive == -1)
+                        {
+                            // Connect dummy floppy drive without a disk
+                            Wd.FDD = _noDisk;
+                        }
+                        else
+                        {
+                            Wd.FDD = FDD[Drive];
+                            Wd.FDD.HeadSide = Side;
+                            Wd.FDD.t = Wd.FDD.CurrentTrack;
+                        }
 
                         System = value;
                         break;
@@ -68,6 +78,7 @@ namespace ZXMAK2.Hardware.Quorum
                 return value;
             }
         }
+        #endregion
 
         public FddControllerQuorum() : base(new Wd1793QuorumWrapper())
         {
