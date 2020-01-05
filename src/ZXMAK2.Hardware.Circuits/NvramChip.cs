@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
-
+using ZXMAK2.Dependency;
+using ZXMAK2.Host.Interfaces;
 
 namespace ZXMAK2.Hardware.Circuits
 {
@@ -179,16 +180,14 @@ namespace ZXMAK2.Hardware.Circuits
         {
             try
             {
+                var fileSystem = Locator.TryResolve<IHostFileSystem>();
                 for (int i = 0; i < m_nvram.Length; i++)
                 {
                     m_nvram[i] = 0x00;
                 }
-                if (File.Exists(fileName))
+                if (fileSystem.FileExists(fileName))
                 {
-                    using (FileStream fs = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.Read))
-                    {
-                        fs.Read(m_nvram, 0, m_nvram.Length);
-                    }
+                    fileSystem.ReadBytes(fileName, m_nvram, 0, m_nvram.Length);
                 }
             }
             catch (Exception ex)
@@ -201,10 +200,8 @@ namespace ZXMAK2.Hardware.Circuits
         {
             try
             {
-                using (var fs = new FileStream(fileName, FileMode.Create, FileAccess.Write, FileShare.Read))
-                {
-                    fs.Write(m_nvram, 0, m_nvram.Length);
-                }
+                var fileSystem = Locator.TryResolve<IHostFileSystem>();
+                fileSystem.WriteBytes(fileName, m_nvram, 0, m_nvram.Length);
             }
             catch (Exception ex)
             {

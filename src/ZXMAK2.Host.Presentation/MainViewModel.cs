@@ -301,7 +301,7 @@ namespace ZXMAK2.Host.Presentation
             }
             Title = string.Empty;
             var fileName = Path.Combine(
-                Utils.GetAppDataFolder(),
+                AppFolder.GetAppDataFolder(),
                 "ZXMAK2.vmz");
             if (File.Exists(fileName))
             {
@@ -845,7 +845,7 @@ namespace ZXMAK2.Host.Presentation
 
         private bool CommandQuickLoad_OnCanExecute()
         {
-            var fileName = Path.Combine(Utils.GetAppFolder(), "boot.zip");
+            var fileName = Path.Combine(AppFolder.GetAppFolder(), "boot.zip");
             return m_vm != null &&
                 File.Exists(fileName);
         }
@@ -856,7 +856,7 @@ namespace ZXMAK2.Host.Presentation
             {
                 return;
             }
-            var fileName = Path.Combine(Utils.GetAppFolder(), "boot.zip");
+            var fileName = Path.Combine(AppFolder.GetAppFolder(), "boot.zip");
             if (!File.Exists(fileName))
             {
                 m_userMessage.Error("Quick snapshot boot.zip is missing!");

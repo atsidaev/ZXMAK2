@@ -81,21 +81,5 @@ namespace ZXMAK2.Hardware.Circuits
         }
 
         #endregion
-
-
-        public static string GetFullPathFromRelativePath(string relFileName, string rootPath)
-        {
-            // TODO: rewrite with safe version http://stackoverflow.com/questions/275689/how-to-get-relative-path-from-absolute-path
-            string current = Directory.GetCurrentDirectory();
-            try
-            {
-                Directory.SetCurrentDirectory(rootPath);
-                return Path.GetFullPath(relFileName);
-            }
-            finally
-            {
-                Directory.SetCurrentDirectory(current);
-            }
-        }
     }
 }

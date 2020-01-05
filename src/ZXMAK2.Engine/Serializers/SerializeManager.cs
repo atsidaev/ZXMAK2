@@ -87,7 +87,8 @@ namespace ZXMAK2.Serializers
 
 		public string SaveFileName(string fileName)
 		{
-			using (FileStream stream = new FileStream(fileName, FileMode.Create, FileAccess.Write, FileShare.Read))
+			var fileSystem = Locator.TryResolve<IHostFileSystem>();
+			using (var stream = fileSystem.OpenFile(fileName, FileMode.Create, FileAccess.Write, FileShare.Read))
 				saveStream(stream, Path.GetExtension(fileName).ToUpper(), fileName);
 			return Path.GetFileName(fileName);
 		}
@@ -154,17 +155,19 @@ namespace ZXMAK2.Serializers
 
 		public string OpenFileName(string fileName, bool wp)
 		{
+			var fileSystem = Locator.TryResolve<IHostFileSystem>();
 			string ext = Path.GetExtension(fileName).ToUpper();
 			if (ext != ".ZIP")
 			{
-				using (FileStream stream = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.Read))
+				using (var stream = fileSystem.OpenFile(fileName, FileMode.Open, FileAccess.Read, FileShare.Read))
 					openStream(stream, ext, fileName, wp);
 				return Path.GetFileName(fileName);
 			}
 			else
 			{
 				List<ZipLib.Zip.ZipEntry> list = new List<ZipLib.Zip.ZipEntry>();
-				using (ZipLib.Zip.ZipFile zip = new ZipLib.Zip.ZipFile(fileName))
+				using (var stream = fileSystem.OpenFile(fileName, FileMode.Open, FileAccess.Read, FileShare.Read))
+				using (ZipLib.Zip.ZipFile zip = new ZipLib.Zip.ZipFile(stream))
 				{
 					foreach (ZipLib.Zip.ZipEntry entry in zip)
 					{
@@ -250,7 +253,9 @@ namespace ZXMAK2.Serializers
 			}
 			else
 			{
-				using (ZipLib.Zip.ZipFile zip = new ZipLib.Zip.ZipFile(fileName))
+				var fileSystem = Locator.TryResolve<IHostFileSystem>();
+				using (var stream = fileSystem.OpenFile(fileName, FileMode.Open, FileAccess.Read))
+				using (ZipLib.Zip.ZipFile zip = new ZipLib.Zip.ZipFile(stream))
 					foreach (ZipLib.Zip.ZipEntry entry in zip)
 						if (entry.IsFile && entry.CanDecompress && intCheckCanOpenFileName(entry.Name))
 							return true;

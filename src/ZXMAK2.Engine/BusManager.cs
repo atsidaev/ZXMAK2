@@ -549,6 +549,8 @@ namespace ZXMAK2.Engine
 
         private static Type GetTypeByName(string fullTypeName, string oldAsmName)
         {
+            var fileSystem = Locator.TryResolve<IHostFileSystem>();
+
             var asmName = (string)null;
             var typeName = fullTypeName;
             if (fullTypeName.Contains(','))
@@ -565,7 +567,7 @@ namespace ZXMAK2.Engine
             }
             var asm = asmName != null ?
                 Assembly.Load(asmName) :
-                oldAsmName != null ? Assembly.LoadFrom(oldAsmName) : null;
+                oldAsmName != null ? Assembly.Load(fileSystem.ReadAllBytes(oldAsmName)) : null;
             if (asm != null)
             {
                 return asm.GetType(typeName);

@@ -2,7 +2,8 @@
 using System.IO;
 using ZXMAK2.Engine.Interfaces;
 using ZXMAK2.Engine.Entities;
-
+using ZXMAK2.Host.Interfaces;
+using ZXMAK2.Dependency;
 
 namespace ZXMAK2.Hardware.Evo
 {
@@ -12,7 +13,7 @@ namespace ZXMAK2.Hardware.Evo
 
         private bool sandbox;
         private MemoryPentEvo mem;
-        private FileStream eepromFile;
+        private Stream eepromFile;
         private byte[] eeprom;
         private Mode mode;
         private byte addr;
@@ -65,7 +66,8 @@ namespace ZXMAK2.Hardware.Evo
         {
             if (!sandbox)
             {
-                using (eepromFile = File.Open(m_fileName, FileMode.OpenOrCreate))
+                var fileSystem = Locator.TryResolve<IHostFileSystem>();
+                using (eepromFile = fileSystem.OpenFile(m_fileName, FileMode.OpenOrCreate))
                 {
                     if (eepromFile.Length < 256)
                         eepromFile.Write(eeprom, 0, 256);
@@ -85,7 +87,8 @@ namespace ZXMAK2.Hardware.Evo
         {
             if (!sandbox)
             {
-                using (eepromFile = File.Open(m_fileName, FileMode.OpenOrCreate))
+                var fileSystem = Locator.TryResolve<IHostFileSystem>();
+                using (eepromFile = fileSystem.OpenFile(m_fileName, FileMode.OpenOrCreate))
                 {
                     eepromFile.Write(eeprom, 0, 256);
                     eepromFile.Flush();

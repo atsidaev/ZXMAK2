@@ -7,6 +7,7 @@ using ZXMAK2.Engine;
 using ZXMAK2.Engine.Interfaces;
 using ZXMAK2.Hardware.Adlers.Views;
 using ZXMAK2.Host.Interfaces;
+using ZXMAK2.Host.Presentation;
 
 namespace ZXMAK2.Hardware.Adlers.Core
 {
@@ -158,7 +159,7 @@ namespace ZXMAK2.Hardware.Adlers.Core
                 //log filter info
                 traceCountersLog += _traceInfo;
 
-                File.WriteAllText(Path.Combine(Utils.GetAppFolder(), _traceLogFilename), traceCountersLog);
+                File.WriteAllText(Path.Combine(AppFolder.GetAppFolder(), _traceLogFilename), traceCountersLog);
 
                 _counters = null;
             }

@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Xml;
 using System.Collections.Generic;
-
+using ZXMAK2.Dependency;
+using ZXMAK2.Host.Interfaces;
 
 namespace ZXMAK2.Host.Entities.Tools
 {
@@ -23,8 +24,9 @@ namespace ZXMAK2.Host.Entities.Tools
 
         public void LoadMap(string fileName)
         {
+            var fileSystem = Locator.TryResolve<IHostFileSystem>();
             var xml = new XmlDocument();
-            xml.Load(fileName);
+            xml.LoadXml(fileSystem.ReadAllText(fileName));
             LoadMapFromXml(xml);
         }
         

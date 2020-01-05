@@ -8,7 +8,8 @@ using ZXMAK2.Engine.Cpu;
 using ZXMAK2.Hardware.Circuits.Ata;
 using ZXMAK2.Host.Entities;
 using ZXMAK2.Resources;
-
+using ZXMAK2.Host.Interfaces;
+using ZXMAK2.Dependency;
 
 namespace ZXMAK2.Hardware.Atm
 {
@@ -70,7 +71,9 @@ namespace ZXMAK2.Hardware.Atm
             {
                 return;
             }
-            if (File.Exists(m_ideFileName))
+
+            var fileSystem = Locator.TryResolve<IHostFileSystem>();
+            if (fileSystem.FileExists(m_ideFileName))
             {
                 m_ata.Devices[0].DeviceInfo.Load(m_ideFileName);
             }

@@ -44,6 +44,7 @@
     <Reference Include="System.Drawing" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AppFolder.cs" />
     <Compile Include="Interfaces\IAboutView.cs" />
     <Compile Include="Interfaces\ILauncher.cs" />
     <Compile Include="Interfaces\IMachineSettingsView.cs" />

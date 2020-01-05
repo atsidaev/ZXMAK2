@@ -7,7 +7,8 @@ using ZXMAK2.Engine;
 using ZXMAK2.Engine.Interfaces;
 using ZXMAK2.Engine.Entities;
 using System.IO.Compression;
-
+using ZXMAK2.Dependency;
+using ZXMAK2.Host.Interfaces;
 
 namespace ZXMAK2.Serializers.SnapshotSerializers
 {
@@ -264,7 +265,8 @@ namespace ZXMAK2.Serializers.SnapshotSerializers
             {
                 UInt32 fileCrc = BitConverter.ToUInt32(RawData, 12);
                 string fileName = Encoding.ASCII.GetString(GetBytesAsciiZ(RawData, 12 + 4, RawData.Length - (12 + 4)));
-                using (FileStream fs = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.Read))
+                var fileSystem = Locator.TryResolve<IHostFileSystem>();
+                using (var fs = fileSystem.OpenFile(fileName, FileMode.Open, FileAccess.Read, FileShare.Read))
                     fs.Read(snapData, 0, snapData.Length);
                 //if (fileCrc!=0)
                 //{

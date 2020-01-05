@@ -150,13 +150,14 @@ namespace ZXMAK2.Engine
 
         private static void PreLoadPlugins()
         {
-            var configName = Path.Combine(Utils.GetAppFolder(), "plugins.config");
-            if (!File.Exists(configName))
+            const string configFileName = "plugins.config";
+            var fileSystem = Locator.TryResolve<IHostFileSystem>();
+            if (!fileSystem.FileExists(configFileName))
             {
                 return;
             }
             var xml = new XmlDocument();
-            xml.Load(configName);
+            xml.LoadXml(fileSystem.ReadAllText(configFileName));
             var asms = xml.DocumentElement.ChildNodes
                 .OfType<XmlNode>()
                 .Where(node=>string.Compare(node.Name, "Assembly", true)==0);
@@ -171,13 +172,13 @@ namespace ZXMAK2.Engine
                 }
                 var fileName = path.InnerXml;
                 if (string.IsNullOrEmpty(fileName) ||
-                    !File.Exists(fileName))
+                    !fileSystem.FileExists(fileName))
                 {
                     continue;
                 }
                 try
                 {
-                    Assembly.LoadFrom(fileName);
+                    Assembly.Load(fileSystem.ReadAllBytes(fileName));
                 }
                 catch (Exception ex)
                 {

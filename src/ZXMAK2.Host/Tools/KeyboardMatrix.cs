@@ -23,6 +23,7 @@ using System.Xml;
 using System.Collections.Generic;
 using ZXMAK2.Host.Entities;
 using ZXMAK2.Host.Interfaces;
+using ZXMAK2.Dependency;
 
 namespace ZXMAK2.Host.Tools
 {
@@ -127,8 +128,9 @@ namespace ZXMAK2.Host.Tools
             SpeccyKey[][] rows,
             string fileName)
         {
+            var fileSystem = Locator.TryResolve<IHostFileSystem>();
             var xml = new XmlDocument();
-            xml.Load(fileName);
+            xml.LoadXml(fileSystem.ReadAllText(fileName));
             return Deserialize(rows, xml.DocumentElement);
         }
 

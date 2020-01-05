@@ -12,8 +12,7 @@ using ZXMAK2.Engine.Interfaces;
 using ZXMAK2.Engine.Entities;
 using ZXMAK2.Mvvm;
 using System.Drawing;
-
-
+using ZXMAK2.Dependency;
 
 namespace ZXMAK2.Engine
 {
@@ -146,8 +145,9 @@ namespace ZXMAK2.Engine
 
         public void OpenConfig(string fileName)
         {
+            var fileSystem = Locator.TryResolve<IHostFileSystem>();
             fileName = Path.GetFullPath(fileName);
-            using (var stream = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.Read))
+            using (var stream = fileSystem.OpenFile(fileName, FileMode.Open, FileAccess.Read, FileShare.Read))
             {
                 m_configFileName = fileName;
                 Spectrum.BusManager.MachineFile = m_configFileName;
@@ -159,7 +159,8 @@ namespace ZXMAK2.Engine
         {
             if (!string.IsNullOrEmpty(m_configFileName))
             {
-                using (var stream = new FileStream(m_configFileName, FileMode.Create, FileAccess.Write, FileShare.Read))
+                var fileSystem = Locator.TryResolve<IHostFileSystem>();
+                using (var stream = fileSystem.OpenFile(m_configFileName, FileMode.Create, FileAccess.Write, FileShare.Read))
                 {
                     SaveConfig(stream);
                 }
@@ -168,8 +169,9 @@ namespace ZXMAK2.Engine
 
         public void SaveConfigAs(string fileName)
         {
+            var fileSystem = Locator.TryResolve<IHostFileSystem>();
             fileName = Path.GetFullPath(fileName);
-            using (var stream = new FileStream(fileName, FileMode.Create, FileAccess.Write, FileShare.Read))
+            using (var stream = fileSystem.OpenFile(fileName, FileMode.Create, FileAccess.Write, FileShare.Read))
             {
                 m_configFileName = fileName;
                 Spectrum.BusManager.MachineFile = m_configFileName;

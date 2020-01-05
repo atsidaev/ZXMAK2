@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
-
+using ZXMAK2.Dependency;
+using ZXMAK2.Host.Interfaces;
 
 namespace ZXMAK2.Hardware.Circuits
 {
@@ -39,18 +40,16 @@ namespace ZXMAK2.Hardware.Circuits
         {
             try
             {
+                var fileSystem = Locator.TryResolve<IHostFileSystem>();
                 for (var i = 0; i < m_ram.Length; i++)
                 {
                     m_ram[i] = (byte)(i <= 0xD ? 0x00 : 0xFF);
                 }
                 m_ram[0xA] = 0x27;  // enable clock
                 m_ram[0xB] = 0x07;  // 24/binary/daylight saving
-                if (File.Exists(fileName))
+                if (fileSystem.FileExists(fileName))
                 {
-                    using (var fs = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.Read))
-                    {
-                        fs.Read(m_ram, 0, m_ram.Length);
-                    }
+                    fileSystem.ReadBytes(fileName, m_ram, 0, m_ram.Length);
                 }
             }
             catch (Exception ex)
@@ -63,16 +62,14 @@ namespace ZXMAK2.Hardware.Circuits
         {
             try
             {
-                var fileInfo = new FileInfo(fileName);
-                if (fileInfo.Exists && fileInfo.IsReadOnly)
+                var fileSystem = Locator.TryResolve<IHostFileSystem>();
+                if (fileSystem.FileExists(fileName) && fileSystem.GetAttributes(fileName).HasFlag(FileAttributes.ReadOnly))
                 {
                     Logger.Warn("The CMOS image could not be written to disk because marked with read only attribute: {0}", fileName);
                     return;
                 }
-                using (var fs = new FileStream(fileName, FileMode.Create, FileAccess.Write, FileShare.Read))
-                {
-                    fs.Write(m_ram, 0, m_ram.Length);
-                }
+                
+                fileSystem.WriteBytes(fileName, m_ram, 0, m_ram.Length);
             }
             catch (Exception ex)
             {

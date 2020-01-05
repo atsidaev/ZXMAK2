@@ -5,6 +5,7 @@ using System.Xml;
 using ZXMAK2.Dependency;
 using ZXMAK2.Engine;
 using ZXMAK2.Host.Interfaces;
+using ZXMAK2.Host.Presentation;
 
 namespace ZXMAK2.Hardware.Adlers.Views.AssemblerView
 {
@@ -38,11 +39,11 @@ namespace ZXMAK2.Hardware.Adlers.Views.AssemblerView
         #region Load/Save settings
         private void LoadConfig()
         {
-            if (!File.Exists(Path.Combine(Utils.GetAppFolder(), FormCpu.ConfigXmlFileName)))
+            if (!File.Exists(Path.Combine(AppFolder.GetAppFolder(), FormCpu.ConfigXmlFileName)))
                 return;
 
             XmlDocument xmlDoc = new XmlDocument();
-            xmlDoc.Load(Path.Combine(Utils.GetAppFolder(), FormCpu.ConfigXmlFileName));
+            xmlDoc.Load(Path.Combine(AppFolder.GetAppFolder(), FormCpu.ConfigXmlFileName));
 
             //Tcp->Proxy enabled
             XmlNode node = xmlDoc.DocumentElement.SelectSingleNode("/Root/Assembler/Settings/Tcp");

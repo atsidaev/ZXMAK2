@@ -49,6 +49,8 @@ namespace ZXMAK2.Serializers
                 return;
             }
 
+            var fileSystem = Locator.TryResolve<IHostFileSystem>();
+
             var fileName = image.FileName;
             if (!string.IsNullOrEmpty(fileName))
             {
@@ -58,13 +60,12 @@ namespace ZXMAK2.Serializers
             }
             if (string.IsNullOrEmpty(fileName))
             {
-                string folderName = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-                folderName = Path.Combine(folderName, "Images");
+                var folderName = "Images";
                 for (int i = 0; i < 10001; i++)
                 {
                     fileName = string.Format("zxmak2image{0:D3}{1}", i, GetDefaultExtension());
-                    fileName = Path.Combine(folderName, fileName);
-                    if (!File.Exists(fileName))
+                    fileName = fileSystem.CombinePath(folderName, fileName);
+                    if (!fileSystem.FileExists(fileName))
                         break;
                     fileName = string.Empty;
                 }
@@ -100,8 +101,8 @@ namespace ZXMAK2.Serializers
                 else
                 {
                     string folderName = Path.GetDirectoryName(fileName);
-                    if (!Directory.Exists(folderName))
-                        Directory.CreateDirectory(folderName);
+                    if (!fileSystem.DirectoryExists(folderName))
+                        fileSystem.CreateDirectory(folderName);
                     image.FileName = fileName;
                     SaveFileName(image.FileName);
                     Locator.Resolve<IUserMessage>().Info(

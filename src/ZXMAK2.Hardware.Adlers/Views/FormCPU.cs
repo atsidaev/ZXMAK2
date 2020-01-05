@@ -25,6 +25,7 @@ using ZXMAK2.Hardware.Adlers.Views.AssemblerView;
 using ZXMAK2.Hardware.Adlers.Views.GraphicsEditorView;
 using System.Runtime.InteropServices;
 using System.Xml.Schema;
+using ZXMAK2.Host.Presentation;
 
 namespace ZXMAK2.Hardware.Adlers.Views
 {
@@ -623,7 +624,7 @@ namespace ZXMAK2.Hardware.Adlers.Views
 
             if (dissassembly != String.Empty)
             {
-                File.WriteAllText(Path.Combine(Utils.GetAppFolder(), "dis.asm"), dissassembly);
+                File.WriteAllText(Path.Combine(AppFolder.GetAppFolder(), "dis.asm"), dissassembly);
                 Locator.Resolve<IUserMessage>().Info("File dis.asm saved!");
             }
             else
@@ -2016,11 +2017,11 @@ namespace ZXMAK2.Hardware.Adlers.Views
             System.IO.StreamReader file = null;
             try
             {
-                if (!File.Exists(Path.Combine(Utils.GetAppFolder(), fileName)))
+                if (!File.Exists(Path.Combine(AppFolder.GetAppFolder(), fileName)))
                     throw new Exception("file " + fileName + " does not exists...");
 
                 string dbgCommandFromFile = String.Empty;
-                file = new System.IO.StreamReader(Path.Combine(Utils.GetAppFolder(), fileName));
+                file = new System.IO.StreamReader(Path.Combine(AppFolder.GetAppFolder(), fileName));
                 while ((dbgCommandFromFile = file.ReadLine()) != null)
                 {
                     if (dbgCommandFromFile.Trim() == String.Empty || dbgCommandFromFile[0] == ';')
@@ -2049,7 +2050,7 @@ namespace ZXMAK2.Hardware.Adlers.Views
             System.IO.StreamWriter file = null;
             try
             {
-                file = new System.IO.StreamWriter(Path.Combine(Utils.GetAppFolder(), fileName));
+                file = new System.IO.StreamWriter(Path.Combine(AppFolder.GetAppFolder(), fileName));
 
                 foreach (KeyValuePair<byte, BreakpointAdlers> breakpoint in localBreakpointsList)
                 {
@@ -2273,8 +2274,8 @@ namespace ZXMAK2.Hardware.Adlers.Views
         private XmlNode _xmlNode_SavedAssemblerSettings = null;
         private void SaveConfig()
         {
-            XmlWriter writer = XmlWriter.Create(Path.Combine(Utils.GetAppFolder(), ConfigXmlFileName));
-            //using (XmlWriter writer = XmlWriter.Create(Path.Combine(Utils.GetAppFolder(), configXmlFileName)))
+            XmlWriter writer = XmlWriter.Create(Path.Combine(AppFolder.GetAppFolder(), ConfigXmlFileName));
+            //using (XmlWriter writer = XmlWriter.Create(Path.Combine(AppFolder.GetAppFolder(), configXmlFileName)))
             {
                 writer.WriteStartElement("Root");
                 //Load on startup
@@ -2341,18 +2342,18 @@ namespace ZXMAK2.Hardware.Adlers.Views
 
         private void LoadConfig()
         {           
-            if (!File.Exists(Path.Combine(Utils.GetAppFolder(), ConfigXmlFileName)))
+            if (!File.Exists(Path.Combine(AppFolder.GetAppFolder(), ConfigXmlFileName)))
                 return;
 
             XmlDocument xmlDoc = new System.Xml.XmlDocument();
             try
             {
-                xmlDoc.Load(Path.Combine(Utils.GetAppFolder(), ConfigXmlFileName));
+                xmlDoc.Load(Path.Combine(AppFolder.GetAppFolder(), ConfigXmlFileName));
             }
             catch(XmlException)
             {
                 Locator.Resolve<IUserMessage>().Error("Configuration file is corrupted and will be deleted.");
-                File.Delete(Path.Combine(Utils.GetAppFolder(), ConfigXmlFileName));
+                File.Delete(Path.Combine(AppFolder.GetAppFolder(), ConfigXmlFileName));
                 return;
             }
 
@@ -2465,7 +2466,7 @@ namespace ZXMAK2.Hardware.Adlers.Views
             string strFileName = textBoxTraceFileName.Text;
             if (strFileName.Length == 0)
                 return;
-            string logFileName = Path.Combine(Utils.GetAppFolder(), strFileName);
+            string logFileName = Path.Combine(AppFolder.GetAppFolder(), strFileName);
             if (!File.Exists(logFileName))
                 return;
             System.Diagnostics.Process.Start(logFileName);

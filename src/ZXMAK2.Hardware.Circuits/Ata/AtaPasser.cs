@@ -1,12 +1,13 @@
 ﻿using System;
 using System.IO;
-
+using ZXMAK2.Dependency;
+using ZXMAK2.Host.Interfaces;
 
 namespace ZXMAK2.Hardware.Circuits.Ata
 {
     public class AtaPasser : IDisposable
     {
-        private FileStream _hDevice;
+        private Stream _hDevice;
         private PhysicalDeviceInfo _deviceInfo;
         private bool _isReadOnly;
 
@@ -21,9 +22,11 @@ namespace ZXMAK2.Hardware.Circuits.Ata
         {
             try
             {
+                var fileSystem = Locator.TryResolve<IHostFileSystem>();
+
                 _deviceInfo = deviceInfo;
                 _isReadOnly = isReadOnly;
-                _hDevice = new FileStream(
+                _hDevice = fileSystem.OpenFile(
                     _deviceInfo.filename,
                     _isReadOnly ? FileMode.Open : FileMode.OpenOrCreate,
                     _isReadOnly ? FileAccess.Read : FileAccess.ReadWrite,

@@ -4,30 +4,32 @@ using System.Xml;
 using System.Collections.Generic;
 using System.Reflection;
 using ZXMAK2.Engine;
-
+using ZXMAK2.Host.Interfaces;
+using ZXMAK2.Dependency;
 
 namespace ZXMAK2.Hardware
 {
     public class RomPack
     {
+        private const string RomsFolderName = "roms";
+        private const string RomsPakFileName = "ROMS.PAK";
+
         private static long GetImageLength(string fileName)
         {
-            var folderName = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            var fileSystem = Locator.TryResolve<IHostFileSystem>();
 
-            // override
-            var romsFolderName = Path.Combine(folderName, "roms");
-            if (Directory.Exists(romsFolderName))
+            // override ROMS.PAK with unzipped directory
+            if (fileSystem.DirectoryExists(RomsFolderName))
             {
-                var romsFileName = Path.Combine(romsFolderName, fileName);
-                if (File.Exists(romsFileName))
+                var romsFileName = fileSystem.CombinePath(RomsFolderName, fileName);
+                if (fileSystem.FileExists(romsFileName))
                 {
-                    return new FileInfo(romsFileName).Length;
+                    return fileSystem.GetFileLength(romsFileName);
                 }
             }
 
-            var pakFileName = Path.Combine(folderName, "ROMS.PAK");
-
-            using (ZipLib.Zip.ZipFile zip = new ZipLib.Zip.ZipFile(pakFileName))
+            using (var pakFile = fileSystem.OpenFile(RomsPakFileName, FileMode.Open, FileAccess.Read))
+            using (ZipLib.Zip.ZipFile zip = new ZipLib.Zip.ZipFile(pakFile))
             {
                 foreach (ZipLib.Zip.ZipEntry entry in zip)
                 {
@@ -44,25 +46,23 @@ namespace ZXMAK2.Hardware
 
         private static Stream GetImageStream(string fileName)
         {
-            var folderName = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+            var fileSystem = Locator.TryResolve<IHostFileSystem>();
 
             // override
-            var romsFolderName = Path.Combine(folderName, "roms");
-            if (Directory.Exists(romsFolderName))
+            if (fileSystem.DirectoryExists(RomsFolderName))
             {
-                var romsFileName = Path.Combine(romsFolderName, fileName);
-                if (File.Exists(romsFileName))
+                var romsFileName = fileSystem.CombinePath(RomsFolderName, fileName);
+                if (fileSystem.FileExists(romsFileName))
                 {
-                    using (var fs = new FileStream(romsFileName, FileMode.Open, FileAccess.Read, FileShare.Read))
+                    using (var fs = fileSystem.OpenFile(romsFileName, FileMode.Open, FileAccess.Read))
                     {
                         return CreateStream(fs, fs.Length);
                     }
                 }
             }
-
-            var pakFileName = Path.Combine(folderName, "ROMS.PAK");
-
-            using (ZipLib.Zip.ZipFile zip = new ZipLib.Zip.ZipFile(pakFileName))
+            
+            using (var pakFile = fileSystem.OpenFile(RomsPakFileName, FileMode.Open, FileAccess.Read))
+            using (ZipLib.Zip.ZipFile zip = new ZipLib.Zip.ZipFile(pakFile))
             {
                 foreach (ZipLib.Zip.ZipEntry entry in zip)
                 {

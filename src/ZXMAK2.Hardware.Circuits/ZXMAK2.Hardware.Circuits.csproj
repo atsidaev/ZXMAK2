@@ -80,6 +80,10 @@
       <Name>ZXMAK2.Dependency</Name>
       <Private>False</Private>
     </ProjectReference>
+    <ProjectReference Include="..\ZXMAK2.Host\ZXMAK2.Host.csproj">
+      <Project>{7267b638-8145-46bd-ac72-60d0d6002b51}</Project>
+      <Name>ZXMAK2.Host</Name>
+    </ProjectReference>
     <ProjectReference Include="..\ZXMAK2.Logging\ZXMAK2.Logging.csproj">
       <Project>{B75EFD3C-BEC5-4090-AAFA-CC9E5906C876}</Project>
       <Name>ZXMAK2.Logging</Name>

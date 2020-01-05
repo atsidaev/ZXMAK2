@@ -2,7 +2,8 @@
 using System.Xml;
 using System.IO;
 using System.Reflection;
-
+using ZXMAK2.Host.Interfaces;
+using ZXMAK2.Dependency;
 
 namespace ZXMAK2.Hardware.Circuits.Ata
 {
@@ -59,19 +60,27 @@ namespace ZXMAK2.Hardware.Circuits.Ata
             Utils.SetXmlAttribute(geometryNode, "heads", Heads);
             Utils.SetXmlAttribute(geometryNode, "sectors", Sectors);
             Utils.SetXmlAttribute(geometryNode, "lba", Lba);
-            xml.Save(fileName);
+
+            var fileSystem = Locator.TryResolve<IHostFileSystem>();
+            using (var file = fileSystem.OpenFile(fileName, FileMode.OpenOrCreate, FileAccess.Write))
+            {
+                xml.Save(file);
+                file.Flush();
+            }
         }
 
         public void Load(string fileName)
         {
+            var fileSystem = Locator.TryResolve<IHostFileSystem>();
+
             XmlDocument xml = new XmlDocument();
-            xml.Load(fileName);
+            xml.LoadXml(fileSystem.ReadAllText(fileName));
             XmlNode root = xml["IdeDiskDescriptor"];
             XmlNode imageNode = root["Image"];
             XmlNode geometryNode = root["Geometry"];
             FileName = Utils.GetXmlAttributeAsString(imageNode, "fileName", FileName ?? string.Empty);
             if (FileName != string.Empty && !Path.IsPathRooted(FileName))
-                FileName = Utils.GetFullPathFromRelativePath(FileName, Path.GetDirectoryName(fileName));
+                FileName = fileSystem.GetFullPathFromRelativePath(FileName, Path.GetDirectoryName(fileName));
             SerialNumber = Utils.GetXmlAttributeAsString(imageNode, "serial", SerialNumber);
             FirmwareRevision = Utils.GetXmlAttributeAsString(imageNode, "revision", FirmwareRevision);
             ModelNumber = Utils.GetXmlAttributeAsString(imageNode, "model", ModelNumber);

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
-
+using ZXMAK2.Dependency;
+using ZXMAK2.Host.Interfaces;
 
 namespace ZXMAK2.Hardware.Circuits.SecureDigital
 {
@@ -35,7 +36,7 @@ namespace ZXMAK2.Hardware.Circuits.SecureDigital
 
         private UInt32 arg;
 
-        private FileStream fstream;
+        private Stream fstream;
 
         #endregion Fields
 
@@ -52,10 +53,11 @@ namespace ZXMAK2.Hardware.Circuits.SecureDigital
         {
             if (fstream != null)
                 Close();
-
-            if (File.Exists(fname))
+            
+            var fileSystem = Locator.TryResolve<IHostFileSystem>();
+            if (fileSystem.FileExists(fname))
             {
-                fstream = File.Open(fname, FileMode.Open, FileAccess.ReadWrite);
+                fstream = fileSystem.OpenFile(fname, FileMode.Open, FileAccess.ReadWrite);
                 Reset();
             }
         }

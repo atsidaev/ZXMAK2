@@ -59,6 +59,7 @@
     <Compile Include="Entities\SyncSource.cs" />
     <Compile Include="Entities\FrameVideo.cs" />
     <Compile Include="Interfaces\IFrameInfo.cs" />
+    <Compile Include="Interfaces\IHostFileSystem.cs" />
     <Compile Include="Interfaces\IHostService.cs" />
     <Compile Include="Interfaces\IHostDeviceInfo.cs" />
     <Compile Include="Interfaces\IHostJoystick.cs" />

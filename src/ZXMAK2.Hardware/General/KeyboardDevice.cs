@@ -41,7 +41,7 @@ namespace ZXMAK2.Hardware.General
             m_port = 0xFE;
             _matrix = KeyboardMatrix.Deserialize(
                 KeyboardMatrix.DefaultRows,
-                Path.Combine(Utils.GetAppFolder(), "Keyboard.config"));
+                "Keyboard.config");
             OnProcessConfigChange();
         }
 

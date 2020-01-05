@@ -9,6 +9,7 @@ using ZXMAK2.Engine;
 using ZXMAK2.Engine.Interfaces;
 using ZXMAK2.Hardware.Adlers.Core;
 using ZXMAK2.Host.Interfaces;
+using ZXMAK2.Host.Presentation;
 
 namespace ZXMAK2.Hardware.Adlers.Views.GraphicsEditorView
 {
@@ -509,7 +510,7 @@ namespace ZXMAK2.Hardware.Adlers.Views.GraphicsEditorView
             }
             if (fileOut != String.Empty)
             {
-                File.WriteAllText(Path.Combine(Utils.GetAppFolder(), "screen_bytes.asm"), fileOut);
+                File.WriteAllText(Path.Combine(AppFolder.GetAppFolder(), "screen_bytes.asm"), fileOut);
                 Locator.Resolve<IUserMessage>().Info("Sprite saved in screen_bytes.asm file !");
             }
             return true;
@@ -546,7 +547,7 @@ namespace ZXMAK2.Hardware.Adlers.Views.GraphicsEditorView
                 }
             }
 
-            string filePath = Path.Combine(Utils.GetAppFolder(), fileName);
+            string filePath = Path.Combine(AppFolder.GetAppFolder(), fileName);
 
             if (File.Exists(filePath))
                 File.Delete(filePath);

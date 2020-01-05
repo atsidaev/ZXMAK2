@@ -4,7 +4,8 @@ using System.Collections.Generic;
 using System.Xml;
 using System.IO;
 using System.Reflection;
-
+using ZXMAK2.Dependency;
+using ZXMAK2.Host.Interfaces;
 
 namespace ZXMAK2.Engine
 {
@@ -14,17 +15,18 @@ namespace ZXMAK2.Engine
 
         public void Load()
         {
-            var folderName = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            var fileName = Path.Combine(folderName, "machines.config");
-            if (File.Exists(fileName))
+            const string configFileName = "machines.config";
+            var fileSystem = Locator.TryResolve<IHostFileSystem>();
+            if (fileSystem.FileExists(configFileName))
             {
-                Load(fileName);
+                Load(configFileName);
             }
         }
 
         public void Load(string fileName)
         {
-            m_config.Load(fileName);
+            var fileSystem = Locator.TryResolve<IHostFileSystem>();
+            m_config.LoadXml(fileSystem.ReadAllText(fileName));
         }
 
         public IEnumerable<string> GetNames()

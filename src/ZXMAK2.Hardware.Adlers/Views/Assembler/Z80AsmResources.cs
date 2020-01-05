@@ -7,6 +7,7 @@ using ZXMAK2.Engine;
 using FastColoredTextBoxNS;
 using ZXMAK2.Dependency;
 using ZXMAK2.Host.Interfaces;
+using ZXMAK2.Host.Presentation;
 
 namespace ZXMAK2.Hardware.Adlers.Views.AssemblerView
 {
@@ -27,7 +28,7 @@ namespace ZXMAK2.Hardware.Adlers.Views.AssemblerView
         {
             treeZ80Resources.Nodes.Clear();
 
-            if (!File.Exists(Path.Combine(Utils.GetAppFolder(), _configFileName)))
+            if (!File.Exists(Path.Combine(AppFolder.GetAppFolder(), _configFileName)))
             {
                 System.Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor;
                 string errMessage;
@@ -44,7 +45,7 @@ namespace ZXMAK2.Hardware.Adlers.Views.AssemblerView
             //ToDo: here must file check follow because server returns html back instead of erroneous HttpStatusCode response
 
             XmlDocument xmlDoc = new XmlDocument();
-            xmlDoc.Load(Path.Combine(Utils.GetAppFolder(), _configFileName));
+            xmlDoc.Load(Path.Combine(AppFolder.GetAppFolder(), _configFileName));
 
             //Add screen libs
             XmlNodeList nodes = xmlDoc.DocumentElement.SelectNodes("/Root/libs/item");
