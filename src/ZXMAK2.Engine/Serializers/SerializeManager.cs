@@ -12,7 +12,7 @@ namespace ZXMAK2.Serializers
     public abstract class SerializeManager : ISerializeManager
 	{
 		private Dictionary<string, IFormatSerializer> _formats = new Dictionary<string, IFormatSerializer>();
-
+		private readonly IHostFileSystem _fileSystem = Locator.TryResolve<IHostFileSystem>();
 
 		public string GetOpenExtFilter()
 		{
@@ -87,19 +87,18 @@ namespace ZXMAK2.Serializers
 
 		public string SaveFileName(string fileName)
 		{
-			var fileSystem = Locator.TryResolve<IHostFileSystem>();
-			using (var stream = fileSystem.OpenFile(fileName, FileMode.Create, FileAccess.Write, FileShare.Read))
-				saveStream(stream, Path.GetExtension(fileName).ToUpper(), fileName);
-			return Path.GetFileName(fileName);
+			using (var stream = _fileSystem.OpenFile(fileName, FileMode.Create, FileAccess.Write, FileShare.Read))
+				saveStream(stream, _fileSystem.GetExtension(fileName).ToUpper(), fileName);
+			return _fileSystem.GetFileName(fileName);
 		}
 
 		public string OpenFileStream(string fileName, Stream fileStream)
 		{
-			string ext = Path.GetExtension(fileName).ToUpper();
+			string ext = _fileSystem.GetExtension(fileName).ToUpper();
 			if (ext != ".ZIP")
 			{
 				openStream(fileStream, ext, string.Empty, true);
-				return Path.GetFileName(fileName);
+				return _fileSystem.GetFileName(fileName);
 			}
 			else
 			{
@@ -110,7 +109,7 @@ namespace ZXMAK2.Serializers
 					foreach (ZipLib.Zip.ZipEntry entry in zip)
 					{
 						if (entry.IsFile && entry.CanDecompress &&
-						   Path.GetExtension(entry.Name).ToUpper() != ".ZIP" &&
+						   _fileSystem.GetExtension(entry.Name).ToUpper() != ".ZIP" &&
 						   CheckCanOpenFileName(entry.Name))
 						{
 							//return openZipEntry(fileName, zip, entry);
@@ -129,7 +128,7 @@ namespace ZXMAK2.Serializers
                         {
                             selEntry = (ZipLib.Zip.ZipEntry)service.ObjectSelector(
                                 list.ToArray(),
-                                Path.GetFileName(fileName));
+                                _fileSystem.GetFileName(fileName));
                         }
                         else
                         {
@@ -155,24 +154,23 @@ namespace ZXMAK2.Serializers
 
 		public string OpenFileName(string fileName, bool wp)
 		{
-			var fileSystem = Locator.TryResolve<IHostFileSystem>();
-			string ext = Path.GetExtension(fileName).ToUpper();
+			string ext = _fileSystem.GetExtension(fileName).ToUpper();
 			if (ext != ".ZIP")
 			{
-				using (var stream = fileSystem.OpenFile(fileName, FileMode.Open, FileAccess.Read, FileShare.Read))
+				using (var stream = _fileSystem.OpenFile(fileName, FileMode.Open, FileAccess.Read, FileShare.Read))
 					openStream(stream, ext, fileName, wp);
-				return Path.GetFileName(fileName);
+				return _fileSystem.GetFileName(fileName);
 			}
 			else
 			{
 				List<ZipLib.Zip.ZipEntry> list = new List<ZipLib.Zip.ZipEntry>();
-				using (var stream = fileSystem.OpenFile(fileName, FileMode.Open, FileAccess.Read, FileShare.Read))
+				using (var stream = _fileSystem.OpenFile(fileName, FileMode.Open, FileAccess.Read, FileShare.Read))
 				using (ZipLib.Zip.ZipFile zip = new ZipLib.Zip.ZipFile(stream))
 				{
 					foreach (ZipLib.Zip.ZipEntry entry in zip)
 					{
 						if (entry.IsFile && entry.CanDecompress &&
-						   Path.GetExtension(entry.Name).ToUpper() != ".ZIP" &&
+						   _fileSystem.GetExtension(entry.Name).ToUpper() != ".ZIP" &&
 						   CheckCanOpenFileName(entry.Name))
 						{
 							//return openZipEntry(fileName, zip, entry);
@@ -191,7 +189,7 @@ namespace ZXMAK2.Serializers
                         {
                             selEntry = (ZipLib.Zip.ZipEntry)service.ObjectSelector(
                                 list.ToArray(),
-                                Path.GetFileName(fileName));
+                                _fileSystem.GetFileName(fileName));
                         }
                         else 
                         {
@@ -229,7 +227,7 @@ namespace ZXMAK2.Serializers
 				{
 					if (intCheckCanOpenFileName(entry.Name))
 					{
-						openStream(ms, Path.GetExtension(entry.Name).ToUpper(), source, true);
+						openStream(ms, _fileSystem.GetExtension(entry.Name).ToUpper(), source, true);
 					}
 					else
 					{
@@ -239,7 +237,7 @@ namespace ZXMAK2.Serializers
                             entry.Name);
 						return string.Empty;
 					}
-					return string.Format("{0}/{1}", Path.GetFileName(fileName), entry.Name);
+					return string.Format("{0}/{1}", _fileSystem.GetFileName(fileName), entry.Name);
 				}
 			}
 		}
@@ -247,14 +245,13 @@ namespace ZXMAK2.Serializers
 
 		public bool CheckCanOpenFileName(string fileName)
 		{
-			if (Path.GetExtension(fileName).ToUpper() != ".ZIP")
+			if (_fileSystem.GetExtension(fileName).ToUpper() != ".ZIP")
 			{
 				return intCheckCanOpenFileName(fileName);
 			}
 			else
 			{
-				var fileSystem = Locator.TryResolve<IHostFileSystem>();
-				using (var stream = fileSystem.OpenFile(fileName, FileMode.Open, FileAccess.Read))
+				using (var stream = _fileSystem.OpenFile(fileName, FileMode.Open, FileAccess.Read))
 				using (ZipLib.Zip.ZipFile zip = new ZipLib.Zip.ZipFile(stream))
 					foreach (ZipLib.Zip.ZipEntry entry in zip)
 						if (entry.IsFile && entry.CanDecompress && intCheckCanOpenFileName(entry.Name))
@@ -265,7 +262,7 @@ namespace ZXMAK2.Serializers
 
 		public bool CheckCanOpenFileStream(string fileName, Stream fileStream)
 		{
-			if (Path.GetExtension(fileName).ToUpper() != ".ZIP")
+			if (_fileSystem.GetExtension(fileName).ToUpper() != ".ZIP")
 			{
 				return intCheckCanOpenFileName(fileName);
 			}
@@ -326,7 +323,7 @@ namespace ZXMAK2.Serializers
 
 		private bool intCheckCanOpenFileName(string fileName)
 		{
-			string ext = Path.GetExtension(fileName).ToUpper();
+			string ext = _fileSystem.GetExtension(fileName).ToUpper();
 			foreach (string se in OpenFileExtensionList)
 			{
 				if (ext == se) return true;
@@ -337,7 +334,7 @@ namespace ZXMAK2.Serializers
 
 		private bool intCheckCanSaveFileName(string fileName)
 		{
-			var ext = Path.GetExtension(fileName).ToUpper();
+			var ext = _fileSystem.GetExtension(fileName).ToUpper();
 			foreach (var se in SaveFileExtensionList)
 			{
 				if (ext == se) return true;

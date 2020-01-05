@@ -40,14 +40,16 @@ namespace ZXMAK2.Hardware.Circuits.Ata
         
         public void Save(string fileName)
         {
+            var fileSystem = Locator.TryResolve<IHostFileSystem>();
+
             XmlDocument xml = new XmlDocument();
             XmlNode root = xml.AppendChild(xml.CreateElement("IdeDiskDescriptor"));
             XmlNode imageNode = root.AppendChild(xml.CreateElement("Image"));
             string imageFile = FileName ?? string.Empty;
             if (imageFile != string.Empty &&
-                Path.GetDirectoryName(imageFile) == Path.GetDirectoryName(fileName))
+                fileSystem.GetDirectoryName(imageFile) == fileSystem.GetDirectoryName(fileName))
             {
-                imageFile = Path.GetFileName(imageFile);
+                imageFile = fileSystem.GetFileName(imageFile);
             }
             Utils.SetXmlAttribute(imageNode, "fileName", imageFile);
             Utils.SetXmlAttribute(imageNode, "isReadOnly", ReadOnly);
@@ -61,7 +63,6 @@ namespace ZXMAK2.Hardware.Circuits.Ata
             Utils.SetXmlAttribute(geometryNode, "sectors", Sectors);
             Utils.SetXmlAttribute(geometryNode, "lba", Lba);
 
-            var fileSystem = Locator.TryResolve<IHostFileSystem>();
             using (var file = fileSystem.OpenFile(fileName, FileMode.OpenOrCreate, FileAccess.Write))
             {
                 xml.Save(file);
@@ -79,8 +80,8 @@ namespace ZXMAK2.Hardware.Circuits.Ata
             XmlNode imageNode = root["Image"];
             XmlNode geometryNode = root["Geometry"];
             FileName = Utils.GetXmlAttributeAsString(imageNode, "fileName", FileName ?? string.Empty);
-            if (FileName != string.Empty && !Path.IsPathRooted(FileName))
-                FileName = fileSystem.GetFullPathFromRelativePath(FileName, Path.GetDirectoryName(fileName));
+            if (FileName != string.Empty && !fileSystem.IsPathRooted(FileName))
+                FileName = fileSystem.GetFullPathFromRelativePath(FileName, fileSystem.GetDirectoryName(fileName));
             SerialNumber = Utils.GetXmlAttributeAsString(imageNode, "serial", SerialNumber);
             FirmwareRevision = Utils.GetXmlAttributeAsString(imageNode, "revision", FirmwareRevision);
             ModelNumber = Utils.GetXmlAttributeAsString(imageNode, "model", ModelNumber);

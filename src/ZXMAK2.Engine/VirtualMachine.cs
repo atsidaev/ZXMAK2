@@ -146,7 +146,7 @@ namespace ZXMAK2.Engine
         public void OpenConfig(string fileName)
         {
             var fileSystem = Locator.TryResolve<IHostFileSystem>();
-            fileName = Path.GetFullPath(fileName);
+            fileName = fileSystem.GetFullPath(fileName);
             using (var stream = fileSystem.OpenFile(fileName, FileMode.Open, FileAccess.Read, FileShare.Read))
             {
                 m_configFileName = fileName;
@@ -170,7 +170,7 @@ namespace ZXMAK2.Engine
         public void SaveConfigAs(string fileName)
         {
             var fileSystem = Locator.TryResolve<IHostFileSystem>();
-            fileName = Path.GetFullPath(fileName);
+            fileName = fileSystem.GetFullPath(fileName);
             using (var stream = fileSystem.OpenFile(fileName, FileMode.Create, FileAccess.Write, FileShare.Read))
             {
                 m_configFileName = fileName;

@@ -134,7 +134,9 @@ namespace ZXMAK2.Engine
             extension = extension.Trim();
             if (!extension.StartsWith("."))
                 extension = "." + extension;
-            return Path.ChangeExtension(m_machineFile, extension);
+
+            var fileSystem = Locator.TryResolve<IHostFileSystem>();
+            return fileSystem.ChangeExtensionInPath(m_machineFile, extension);
         }
 
         public T FindDevice<T>()
@@ -542,8 +544,9 @@ namespace ZXMAK2.Engine
 
         private static bool CheckIsLocalAssembly(Assembly asm)
         {
-            var asmPath = Path.GetDirectoryName(Path.GetFullPath(asm.Location));
-            var localPath = Path.GetDirectoryName(Path.GetFullPath(Assembly.GetExecutingAssembly().Location));
+            var fileSystem = Locator.TryResolve<IHostFileSystem>();
+            var asmPath = fileSystem.GetDirectoryName(fileSystem.GetFullPath(asm.Location));
+            var localPath = fileSystem.GetDirectoryName(fileSystem.GetFullPath(Assembly.GetExecutingAssembly().Location));
             return string.Compare(asmPath, localPath, true) == 0;
         }
 

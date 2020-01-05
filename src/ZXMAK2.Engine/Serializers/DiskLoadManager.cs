@@ -54,7 +54,7 @@ namespace ZXMAK2.Serializers
             var fileName = image.FileName;
             if (!string.IsNullOrEmpty(fileName))
             {
-                var serializer = GetSerializer(Path.GetExtension(fileName));
+                var serializer = GetSerializer(fileSystem.GetExtension(fileName));
                 if (serializer == null || !serializer.CanSerialize)
                     fileName = string.Empty;
             }
@@ -77,7 +77,7 @@ namespace ZXMAK2.Serializers
             {
                 var msg = string.Format(
                     "Do you want to save disk changes to {0}",
-                    Path.GetFileName(fileName));
+                    fileSystem.GetFileName(fileName));
                 qr = service.Show(
                     msg, 
                     "Attention!", 
@@ -100,7 +100,7 @@ namespace ZXMAK2.Serializers
                 }
                 else
                 {
-                    string folderName = Path.GetDirectoryName(fileName);
+                    string folderName = fileSystem.GetDirectoryName(fileName);
                     if (!fileSystem.DirectoryExists(folderName))
                         fileSystem.CreateDirectory(folderName);
                     image.FileName = fileName;
