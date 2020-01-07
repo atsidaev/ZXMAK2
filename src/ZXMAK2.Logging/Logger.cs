@@ -1,14 +1,13 @@
 ﻿using System;
 using System.IO;
 using System.Globalization;
-using log4net;
 
 
 namespace ZXMAK2
 {
     public static class Logger
     {
-        private static readonly ILog _logger = LogManager.GetLogger("ZXMAK2");
+        //private static readonly ILog _logger = LogManager.GetLogger("ZXMAK2");
         
         public static void Start()
         {
@@ -16,7 +15,7 @@ namespace ZXMAK2
 
         public static void Finish()
         {
-            LogManager.Shutdown();
+            //LogManager.Shutdown();
         }
 
 
@@ -26,7 +25,7 @@ namespace ZXMAK2
         {
             try
             {
-                _logger.DebugFormat(CultureInfo.InvariantCulture, fmt, args);
+               // _logger.DebugFormat(CultureInfo.InvariantCulture, fmt, args);
             }
             catch (Exception ex)
             {
@@ -38,7 +37,7 @@ namespace ZXMAK2
         {
             try
             {
-                _logger.InfoFormat(CultureInfo.InvariantCulture, fmt, args);
+              //  _logger.InfoFormat(CultureInfo.InvariantCulture, fmt, args);
             }
             catch (Exception ex)
             {
@@ -50,7 +49,7 @@ namespace ZXMAK2
         {
             try
             {
-                _logger.WarnFormat(CultureInfo.InvariantCulture, fmt, args);
+              //  _logger.WarnFormat(CultureInfo.InvariantCulture, fmt, args);
             }
             catch (Exception ex)
             {
@@ -62,7 +61,7 @@ namespace ZXMAK2
         {
             try
             {
-                _logger.ErrorFormat(CultureInfo.InvariantCulture, fmt, args);
+              //  _logger.ErrorFormat(CultureInfo.InvariantCulture, fmt, args);
             }
             catch (Exception ex)
             {
@@ -74,7 +73,7 @@ namespace ZXMAK2
         {
             try
             {
-                _logger.FatalFormat(CultureInfo.InvariantCulture, fmt, args);
+              //  _logger.FatalFormat(CultureInfo.InvariantCulture, fmt, args);
             }
             catch (Exception ex)
             {
@@ -95,7 +94,7 @@ namespace ZXMAK2
                         exception.GetType(),
                         msg);
                 }
-                _logger.Debug(msg, exception);
+              //  _logger.Debug(msg, exception);
             }
             catch (Exception ex)
             {
@@ -116,7 +115,7 @@ namespace ZXMAK2
                         exception.GetType(),
                         msg);
                 }
-                _logger.Info(msg, exception);
+              //  _logger.Info(msg, exception);
             }
             catch (Exception ex)
             {
@@ -137,7 +136,7 @@ namespace ZXMAK2
                         exception.GetType(), 
                         msg);
                 }
-                _logger.Warn(msg, exception);
+              //  _logger.Warn(msg, exception);
             }
             catch (Exception ex)
             {
@@ -158,7 +157,7 @@ namespace ZXMAK2
                         exception.GetType(),
                         msg);
                 }
-                _logger.Error(msg, exception);
+              //  _logger.Error(msg, exception);
             }
             catch (Exception ex)
             {
@@ -179,7 +178,7 @@ namespace ZXMAK2
                         exception.GetType(),
                         msg);
                 }
-                _logger.Fatal(msg, exception);
+              //  _logger.Fatal(msg, exception);
             }
             catch (Exception ex)
             {
