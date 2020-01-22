@@ -76,6 +76,13 @@ namespace ZXMAK2.Hardware.Profi
             0x00, 0x03, 0x18, 0x1B, 0xC0, 0xC3, 0xD8, 0xDB,
         };
 
+        // To convert colors from RGB332 to RGB888 we need to convert 3-bit color to 8-bit.
+        // (0x11111111 / 0x111) = 36.42857142857143, which is float and its usage is slow/inaccurate in runtime,
+        // so we better have rounded precaclulated table.
+        private readonly byte[] m_colors3to8BitsRecalcTable = {
+            0, 36, 73, 109, 146, 182, 219, 255
+        };
+
         protected override ProfiRendererParams CreateProfiRendererParams()
         {
             var timing = base.CreateProfiRendererParams();
@@ -95,13 +102,10 @@ namespace ZXMAK2.Hardware.Profi
             //build tables...
             for (int i = 0; i < 0x100; i++)
             {
-                //Gg0Rr0Bb
-                int g = (i >> 6) & 3;
-                int r = (i >> 3) & 3;
-                int b = (i) & 3;
-                r *= 85;
-                g *= 85;
-                b *= 85;
+                //g4g2g1 r4r2r1 b4b2 (naming from palet.com)
+                int g = m_colors3to8BitsRecalcTable[(i >> 5) & 7];
+                int r = m_colors3to8BitsRecalcTable[(i >> 2) & 7];
+                int b = m_colors3to8BitsRecalcTable[(i << 1) & 7];
                 m_pal_map[i] = 0xFF000000 | (uint)(r << 16) | (uint)(g << 8) | (uint)b;
             }
         }
