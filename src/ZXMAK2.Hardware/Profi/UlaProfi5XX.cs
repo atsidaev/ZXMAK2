@@ -95,12 +95,12 @@ namespace ZXMAK2.Hardware.Profi
             //build tables...
             for (int i = 0; i < 0x100; i++)
             {
-                //Gg0Rr0Bb
-                int g = (i >> 6) & 3;
-                int r = (i >> 3) & 3;
+                //g4g2g1 r4r2r1 b4b2 (naming from palette.com)
+                int g = (i >> 5) & 7;
+                int r = (i >> 2) & 7;
                 int b = (i) & 3;
-                r *= 85;
-                g *= 85;
+                r *= 36;
+                g *= 36;
                 b *= 85;
                 m_pal_map[i] = 0xFF000000 | (uint)(r << 16) | (uint)(g << 8) | (uint)b;
             }
