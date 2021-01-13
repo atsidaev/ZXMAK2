@@ -2,12 +2,13 @@
 
 using ZXMAK2.Hardware.Circuits.SecureDigital;
 using ZXMAK2.Host.Entities;
+using ZXMAK2.Engine;
 using ZXMAK2.Engine.Interfaces;
 using ZXMAK2.Engine.Entities;
 using ZXMAK2.Dependency;
 using ZXMAK2.Host.Interfaces;
 using ZXMAK2.Mvvm;
-
+using System.Xml;
 
 namespace ZXMAK2.Hardware.Evo
 {
@@ -15,10 +16,14 @@ namespace ZXMAK2.Hardware.Evo
     {
         #region Fields
 
+        private bool _isSandbox;
+
         private IMemoryDevice mem;
         private SdCard card;
         private byte buf;
         private bool card_cs;
+
+        private string _imageFileName;
 
         #endregion
 
@@ -27,7 +32,7 @@ namespace ZXMAK2.Hardware.Evo
         {
             Category = BusDeviceCategory.Disk;
             Name = "SD PentEvo";
-            Description = "PentEvo SD Card\r\nWritten by ZEK";
+            Description = "PentEvo SD Card\r\nCompatible with Z-Controller\r\nWritten by ZEK";
         }
 
 
@@ -41,6 +46,7 @@ namespace ZXMAK2.Hardware.Evo
 
         public override void BusInit(IBusManager bmgr)
         {
+            _isSandbox = bmgr.IsSandbox;
             mem = bmgr.FindDevice<IMemoryDevice>();
             bmgr.AddCommandUi(
                 new CommandDelegate(
@@ -57,7 +63,15 @@ namespace ZXMAK2.Hardware.Evo
 
         public override void BusConnect()
         {
-            card = new SdCard();
+            if (!_isSandbox)
+            {
+                if (card?.IsOpened() == true)
+                    card.Close();
+
+                card = new SdCard();
+                if (!string.IsNullOrEmpty(_imageFileName))
+                    card.Open(_imageFileName);
+            }
         }
 
         public override void BusDisconnect()
@@ -150,6 +164,30 @@ namespace ZXMAK2.Hardware.Evo
 
         #endregion
 
+        # region Configuration
+        protected override void OnConfigLoad(XmlNode itemNode)
+        {
+            base.OnConfigLoad(itemNode);
+
+            var image = Utils.GetXmlAttributeAsString(itemNode, "image", null);
+
+            if (!string.IsNullOrEmpty(image))
+            {
+                _imageFileName = image;
+            }
+         }
+
+        protected override void OnConfigSave(XmlNode itemNode)
+        {
+            base.OnConfigSave(itemNode);
+
+            if (!string.IsNullOrEmpty(_imageFileName))
+            {
+                Utils.SetXmlAttribute(itemNode, "image", _imageFileName);
+            }
+        }
+
+        #endregion
 
         #region CommandUi
 
@@ -183,6 +221,7 @@ namespace ZXMAK2.Hardware.Evo
                     return;
                 }
                 card.Open(dlg.FileName);
+                _imageFileName = dlg.FileName;
             }
             catch (Exception ex)
             {

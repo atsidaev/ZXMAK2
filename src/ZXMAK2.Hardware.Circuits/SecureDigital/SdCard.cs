@@ -71,6 +71,11 @@ namespace ZXMAK2.Hardware.Circuits.SecureDigital
             }
         }
 
+        public bool IsOpened()
+        {
+            return fstream != null;
+        }
+
         public void Reset()
         {
             currState = SdState.IDLE;
