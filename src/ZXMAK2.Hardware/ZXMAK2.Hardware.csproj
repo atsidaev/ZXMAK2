@@ -137,6 +137,9 @@
     <Compile Include="Sprinter\SprinterRTC.cs" />
     <Compile Include="Sprinter\SprinterULA.cs" />
     <Compile Include="UlaDeviceBase.cs" />
+    <Compile Include="Uno\IUnoRegisterDevice.cs" />
+    <Compile Include="Uno\UnoRegisters.cs" />
+    <Compile Include="Uno\UnoUart.cs" />
     <Compile Include="ZXBYTE\MemoryByte.cs" />
     <Compile Include="ZXBYTE\MemoryByte128.cs" />
     <Compile Include="ZXBYTE\UlaByte.cs" />

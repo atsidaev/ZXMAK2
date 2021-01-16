@@ -258,6 +258,10 @@ namespace ZXMAK2.Engine
             {
                 m_rzx.SetInput(result);
             }
+
+#if PORTDEBUG
+            Logger.Debug($"Port {addr:X4} -> {result:X2}");
+#endif
             return result;
         }
 
@@ -269,6 +273,9 @@ namespace ZXMAK2.Engine
                 var handled = false;
                 handler(addr, value, ref handled);
             }
+#if PORTDEBUG
+            Logger.Debug($"Port {addr:X4} <- {value:X2}");
+#endif
         }
 
         private void RDNOMREQ(ushort addr)
