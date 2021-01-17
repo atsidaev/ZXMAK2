@@ -18,7 +18,7 @@ namespace ZXMAK2.Hardware.Profi
 
         private bool m_sandbox = false;
         private CpuUnit m_cpu;
-        private IMemoryDevice m_memory;
+        protected IMemoryDevice m_memory;
         private IconDescriptor m_iconHdd = new IconDescriptor("HDD", ResourceImages.OsdHddRd);
         private AtaPort m_ata = new AtaPort();
         private string m_ideFileName;

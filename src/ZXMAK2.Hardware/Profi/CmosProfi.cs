@@ -11,7 +11,7 @@ namespace ZXMAK2.Hardware.Profi
 
         private readonly RtcChip m_rtc = new RtcChip(RtcChipType.DS12885);
         private bool m_isSandBox;
-        private IMemoryDevice m_memory;
+        protected IMemoryDevice m_memory;
         private string m_fileName;
 
         #endregion Fields

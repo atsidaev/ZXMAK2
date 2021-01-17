@@ -94,8 +94,11 @@
     <Compile Include="Pentagon\MemoryPentagon512.cs" />
     <Compile Include="Pentagon\UlaPentagon.cs" />
     <Compile Include="Profi\CmosProfi.cs" />
+    <Compile Include="Profi\CmosProfiNew.cs" />
     <Compile Include="Profi\FddControllerProfi.cs" />
+    <Compile Include="Profi\FddControllerProfiNew.cs" />
     <Compile Include="Profi\IdeProfi.cs" />
+    <Compile Include="Profi\IdeProfiNew.cs" />
     <Compile Include="Profi\KeyboardProfi.cs" />
     <Compile Include="Profi\MemoryProfi1024.cs" />
     <Compile Include="Profi\ProfiRenderer.cs" />
