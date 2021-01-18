@@ -101,6 +101,7 @@
     <Compile Include="Profi\IdeProfiNew.cs" />
     <Compile Include="Profi\KeyboardProfi.cs" />
     <Compile Include="Profi\MemoryProfi1024.cs" />
+    <Compile Include="Profi\MemoryProfi1024New.cs" />
     <Compile Include="Profi\ProfiRenderer.cs" />
     <Compile Include="Profi\UlaKarabasPro.cs" />
     <Compile Include="Profi\UlaProfi3XX.cs" />

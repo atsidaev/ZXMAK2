@@ -12,10 +12,10 @@ namespace ZXMAK2.Hardware.Profi
     {
         #region Fields
 
-        private CpuUnit m_cpu;
-        private UlaProfi3XX m_ulaProfi;
-        private bool m_lock = false;
-        private int m_cmr1mask;
+        protected CpuUnit m_cpu;
+        protected UlaProfi3XX m_ulaProfi;
+        protected bool m_lock = false;
+        protected int m_cmr1mask;
         
         #endregion Fields
 
