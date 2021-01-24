@@ -21,16 +21,13 @@ namespace ZXMAK2.Hardware.Profi
 
         protected override void BusReadMemRamM1(ushort addr, ref byte value)
         {
-            if ((CMR0 & 0x10) != 0)
+            if (SYSEN)
             {
-                if (SYSEN)
-                {
-                    SYSEN = false;
-                }
-                if (DOSEN)
-                {
-                    DOSEN = false;
-                }
+                SYSEN = false;
+            }
+            if (DOSEN)
+            {
+                DOSEN = false;
             }
         }
 
@@ -44,10 +41,10 @@ namespace ZXMAK2.Hardware.Profi
                 GetRomIndex(RomId.ROM_128);
             int videoPage = (CMR0 & 0x08) == 0 ? 5 : 7;
 
-            if (DOSEN && rom14)      // trdos or 48/128
-                romPage = GetRomIndex(RomId.ROM_DOS);// 2;
-            if (SYSEN || (DOSEN && !rom14))
-                romPage = GetRomIndex(RomId.ROM_SYS);// 3;
+            if (DOSEN)      // trdos or 48/128
+                romPage = rom14 ? 
+                GetRomIndex(RomId.ROM_DOS) :// 0;
+                GetRomIndex(RomId.ROM_SYS);// 2;
 
             int sega = CMR1 & m_cmr1mask;
             bool norom = NOROM;
