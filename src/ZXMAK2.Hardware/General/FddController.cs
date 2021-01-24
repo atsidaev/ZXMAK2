@@ -290,6 +290,34 @@ namespace ZXMAK2.Hardware.General
                 value,
                 m_cpu.regs.PC,
                 tact);
+
+            if (reg == WD93REG.CMD)
+            {
+                if ((value & 0xF0) == 0)
+                    Logger.Info($"WD93 CMD: RESTORE");
+                else if ((value & 0xF0) == 0xD0)
+                    Logger.Info($"WD93 CMD: TERMINATE");
+                else if ((value & 0xE0) == 0x40)
+                    Logger.Info($"WD93 CMD: STEP FORWARD");
+                else if ((value & 0xE0) == 0x60)
+                    Logger.Info($"WD93 CMD: STEP BACKWARD");
+                else if ((value & 0xE0) == 0x20)
+                    Logger.Info($"WD93 CMD: STEP");
+                else if ((value & 0xF0) == 0x10)
+                    Logger.Info($"WD93 CMD: SEARCH");
+                else if ((value & 0xE1) == 0x80)
+                    Logger.Info($"WD93 CMD: READ SECTORS");
+                else if ((value & 0xE0) == 0xA0)
+                    Logger.Info($"WD93 CMD: WRITE SECTORS");
+                else if ((value & 0xFB) == 0xF0)
+                    Logger.Info($"WD93 CMD: WRITE TRACK");
+                else if ((value & 0xFB) == 0xE0)
+                    Logger.Info($"WD93 CMD: READ TRACK");
+                else if ((value & 0xFB) == 0xC0)
+                    Logger.Info($"WD93 CMD: READ ADDR");
+                else
+                    Logger.Info($"WD93 CMD: UNKNOWN {value}");
+            }
         }
 
         protected void LogIoRead(long tact, WD93REG reg, byte value)
