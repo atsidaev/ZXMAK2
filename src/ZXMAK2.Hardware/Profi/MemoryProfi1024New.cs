@@ -8,6 +8,12 @@ namespace ZXMAK2.Hardware.Profi
 {
     public class MemoryProfi1024New : MemoryProfi1024
     {
+        protected override void BusReset()
+        {
+            base.BusReset();
+            DOSEN = true;
+        }
+
         protected override void BusReadMem3D00_M1(ushort addr, ref byte value)
         {
             if ((CMR0 & 0x10) != 0)

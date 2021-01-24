@@ -7,6 +7,12 @@ namespace ZXMAK2.Hardware.Profi
 {
     public class IdeProfiNew : IdeProfi
     {
+        public IdeProfiNew() : base()
+        {
+            Name = "IDE PROFI (NEW)";
+            Description = "Profi IDE with new port addresses decoding";
+        }
+
         protected override bool IsExtendedMode
         {
             get
