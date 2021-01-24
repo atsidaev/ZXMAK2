@@ -69,7 +69,7 @@ namespace ZXMAK2.Hardware.Profi
 
         protected override void WritePortFE(ushort addr, byte value, ref bool handled)
         {
-            if ((addr & 0x67) != (0xFE & 0x67) || Memory.DOSEN)
+            if ((addr & 0x67) != (0xFE & 0x67))
             {
                 return;
             }

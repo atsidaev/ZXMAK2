@@ -70,7 +70,7 @@ namespace ZXMAK2.Hardware.Profi
 
         protected virtual void ReadPortFE(ushort addr, ref byte value, ref bool handled)
         {
-            if (handled || m_memory.DOSEN)
+            if (handled)
                 return;
             //handled = true;
 
