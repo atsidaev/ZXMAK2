@@ -8,6 +8,12 @@ namespace ZXMAK2.Hardware.Circuits.Ata
 {
     public class AtaDeviceInfo
     {
+        public enum Mode { None, Chs, Lba, LbaAuto };
+
+        private const int DefaultSectorSize = 512;
+        private const int DefaultHeadsCount = 255;
+        private const int DefaultSectorsPerTrack = 63;
+
         private const string DefaultSerial = "00000000001234567890";
         private const string DefaultModel = "ZXMAK2 HDD IMAGE";
         
@@ -16,6 +22,7 @@ namespace ZXMAK2.Hardware.Circuits.Ata
         public uint Heads { get; private set; }
         public uint Sectors { get; private set; }
         public uint Lba { get; private set; }
+        public Mode AddressingMode { get; private set; }
         public bool ReadOnly { get; private set; }
         public bool IsCdrom { get; private set; }
 
@@ -26,6 +33,7 @@ namespace ZXMAK2.Hardware.Circuits.Ata
         
         public AtaDeviceInfo()
         {
+            AddressingMode = Mode.Chs;
             Cylinders = 20; 
             Heads = 16;
             Sectors = 63; 
@@ -54,11 +62,23 @@ namespace ZXMAK2.Hardware.Circuits.Ata
             Utils.SetXmlAttribute(imageNode, "serial", SerialNumber);
             Utils.SetXmlAttribute(imageNode, "revision", FirmwareRevision);
             Utils.SetXmlAttribute(imageNode, "model", ModelNumber);
-            XmlNode geometryNode = root.AppendChild(xml.CreateElement("Geometry"));
-            Utils.SetXmlAttribute(geometryNode, "cylinders", Cylinders);
-            Utils.SetXmlAttribute(geometryNode, "heads", Heads);
-            Utils.SetXmlAttribute(geometryNode, "sectors", Sectors);
-            Utils.SetXmlAttribute(geometryNode, "lba", Lba);
+
+            if (AddressingMode != Mode.LbaAuto && AddressingMode != Mode.None)
+            {
+                XmlNode geometryNode = root.AppendChild(xml.CreateElement("Geometry"));
+                switch (AddressingMode)
+                {
+                    case Mode.Chs:
+                        Utils.SetXmlAttribute(geometryNode, "cylinders", Cylinders);
+                        Utils.SetXmlAttribute(geometryNode, "heads", Heads);
+                        Utils.SetXmlAttribute(geometryNode, "sectors", Sectors);
+                        break;
+                    case Mode.Lba:
+                        Utils.SetXmlAttribute(geometryNode, "lba", Lba);
+                        break;
+                }
+            }
+
             xml.Save(fileName);
         }
 
@@ -68,7 +88,6 @@ namespace ZXMAK2.Hardware.Circuits.Ata
             xml.Load(fileName);
             XmlNode root = xml["IdeDiskDescriptor"];
             XmlNode imageNode = root["Image"];
-            XmlNode geometryNode = root["Geometry"];
             FileName = Utils.GetXmlAttributeAsString(imageNode, "fileName", FileName ?? string.Empty);
             if (FileName != string.Empty && !Path.IsPathRooted(FileName))
                 FileName = Utils.GetFullPathFromRelativePath(FileName, Path.GetDirectoryName(fileName));
@@ -77,10 +96,53 @@ namespace ZXMAK2.Hardware.Circuits.Ata
             ModelNumber = Utils.GetXmlAttributeAsString(imageNode, "model", ModelNumber);
             IsCdrom = Utils.GetXmlAttributeAsBool(imageNode, "isCdrom", false);
             ReadOnly = Utils.GetXmlAttributeAsBool(imageNode, "isReadOnly", true);
-            Cylinders = Utils.GetXmlAttributeAsUInt32(geometryNode, "cylinders", Cylinders);
-            Heads = Utils.GetXmlAttributeAsUInt32(geometryNode, "heads", Heads);
-            Sectors = Utils.GetXmlAttributeAsUInt32(geometryNode, "sectors", Sectors);
-            Lba = Utils.GetXmlAttributeAsUInt32(geometryNode, "lba", Lba);
+
+            // If LBA is set, then use LBA mode. If nothing is set (LBA, C,H,S) - use LBA mode and autodetect size
+            // Otherwise use CHS mode
+            XmlNode geometryNode = root["Geometry"];
+            if (geometryNode != null)
+            {
+                Lba = Utils.GetXmlAttributeAsUInt32(geometryNode, "lba", 0);
+                if (Lba > 0)
+                    AddressingMode = Mode.Lba;
+                else
+                {
+                    Cylinders = Utils.GetXmlAttributeAsUInt32(geometryNode, "cylinders", 0);
+                    Heads = Utils.GetXmlAttributeAsUInt32(geometryNode, "heads", 0);
+                    Sectors = Utils.GetXmlAttributeAsUInt32(geometryNode, "sectors", 0);
+                    if (Cylinders > 0 || Heads > 0 || Sectors > 0)
+                        AddressingMode = Mode.Chs;
+                    else
+                        AddressingMode = Mode.LbaAuto;
+                }
+            }
+
+            if (AddressingMode == Mode.LbaAuto)
+            {
+                // autodetect LBA size by file size
+                var fileInfo = new FileInfo(FileName);
+                if (fileInfo.Exists)
+                {
+                    var fileSize = fileInfo.Length;
+                    Lba = (uint)(fileSize / DefaultSectorSize + (fileSize % DefaultSectorSize == 0 ? 0 : 1));
+                    AddressingMode = Mode.LbaAuto;
+                }
+                else
+                    AddressingMode = Mode.None; // Emulated machine will not be able to detect the drive or will operate with errors
+            }
+
+            // Autofill some CHS for proper functioning
+            if (AddressingMode == Mode.Lba || AddressingMode == Mode.LbaAuto)
+            {
+                // From wiki: https://en.wikipedia.org/wiki/Logical_block_addressing
+                Cylinders = Lba / (DefaultHeadsCount * DefaultSectorsPerTrack);
+                Heads = (Lba / DefaultSectorsPerTrack) % DefaultHeadsCount;
+                Sectors = (Lba % DefaultSectorsPerTrack) + 1;
+            }
+            else // Or autofill LBA from CHS (from same wiki page)
+            {
+                Lba = (Cylinders * DefaultHeadsCount + Heads) * DefaultSectorsPerTrack + (Sectors - 1);
+            }
         }
 
         private static string GetVersion()
