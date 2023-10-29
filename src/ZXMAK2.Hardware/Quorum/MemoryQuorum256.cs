@@ -86,14 +86,20 @@ namespace ZXMAK2.Hardware.Quorum
             MapWrite4000 = MapRead4000;
             MapWrite8000 = MapRead8000;
             MapWriteC000 = MapReadC000;
+
+            Map48[0] = 0;
+            Map48[1] = 5;
+            Map48[2] = 2;
+            Map48[3] = ramPage;
         }
 
         public override bool SYSEN
         {
+            // Q_B_ROM == 1 means that SYS page is disabled
             get { return (CMR1 & Q_B_ROM) == 0; }
             set
             {
-                if (value)
+                if (!value)
                     CMR1 |= Q_B_ROM;
                 else
                     CMR1 &= Q_B_ROM ^ 0xFF;

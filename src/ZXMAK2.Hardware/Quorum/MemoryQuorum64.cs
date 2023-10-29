@@ -42,6 +42,11 @@ namespace ZXMAK2.Hardware.Quorum
             MapWrite4000 = MapRead4000;
             MapWrite8000 = MapRead8000;
             MapWriteC000 = MapReadC000;
+            
+            Map48[0] = 0;
+            Map48[1] = 5;
+            Map48[2] = 2;
+            Map48[3] = 7;
         }
         #endregion
     }
