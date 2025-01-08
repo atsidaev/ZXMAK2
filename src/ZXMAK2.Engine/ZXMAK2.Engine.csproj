@@ -114,6 +114,7 @@
     <Compile Include="Serializers\SnapshotSerializers\SitSerializer.cs" />
     <Compile Include="Serializers\SnapshotSerializers\SnapshotSerializerBase.cs" />
     <Compile Include="Serializers\SnapshotSerializers\SnaSerializer.cs" />
+    <Compile Include="Serializers\SnapshotSerializers\SpcSerializer.cs" />
     <Compile Include="Serializers\SnapshotSerializers\SzxSerializer.cs" />
     <Compile Include="Serializers\SnapshotSerializers\Z80Serializer.cs" />
     <Compile Include="Serializers\SnapshotSerializers\ZxSerializer.cs" />

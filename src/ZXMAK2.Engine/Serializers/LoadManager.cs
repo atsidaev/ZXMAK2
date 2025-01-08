@@ -25,6 +25,7 @@ namespace ZXMAK2.Serializers
             AddSerializer(new ZxSerializer(_spec));
             AddSerializer(new RzxSerializer(_spec));
             AddSerializer(new IntelHexSerializer(_spec));
+            AddSerializer(new SpcSerializer(_spec));
         }
 	}
 }
