@@ -13,12 +13,16 @@ namespace ZXMAK2.Hardware.Quorum
         private bool m_lock;
         #endregion
 
-        public MemoryQuorum256()
-            : base("Quorum128", 4, 16) // Quorum 256 does not use a separate ROM set
+        public MemoryQuorum256(int ramPageCount)
+            : base("Quorum128", 4, ramPageCount) // Quorum 256 does not use a separate ROM set
         {
-            Name = "QUORUM 256K";
+            Name = $"QUORUM {ramPageCount * 16}K";
         }
 
+        public MemoryQuorum256() : this(16)
+        {
+        }
+        
         #region IBusDevice
 
         public override void BusInit(IBusManager bmgr)
@@ -44,9 +48,7 @@ namespace ZXMAK2.Hardware.Quorum
 
         protected override void UpdateMapping()
         {
-            var ramPage = CMR0 & 7;
-            ramPage |= ((CMR0 & 0xC0) >> 3);
-            ramPage &= 0x0F;     //256K
+            var ramPage = GetRamPage();
 
             var romPage = (CMR0 & 0x10) != 0 ?
                 GetRomIndex(RomId.ROM_SOS) :
@@ -91,6 +93,14 @@ namespace ZXMAK2.Hardware.Quorum
             Map48[1] = 5;
             Map48[2] = 2;
             Map48[3] = ramPage;
+        }
+
+        protected virtual int GetRamPage()
+        {
+            var ramPage = CMR0 & 7;
+            ramPage |= ((CMR0 & 0xC0) >> 3);
+            ramPage &= 0x0F; //256K
+            return ramPage;
         }
 
         public override bool SYSEN
