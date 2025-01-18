@@ -12,7 +12,9 @@ namespace ZXMAK2.Hardware.Quorum
         #region Constants
 
         protected const int Q_F_RAM = 0x01;
+        protected const int Q_PENTAGON = 0x04;
         protected const int Q_RAM_8 = 0x08;
+        protected const int Q_BLK_128 = 0x10;
         protected const int Q_B_ROM = 0x20;
         protected const int Q_BLK_WR = 0x40;
         protected const int Q_TR_DOS = 0x80;
@@ -25,6 +27,13 @@ namespace ZXMAK2.Hardware.Quorum
 
         #endregion Fields
 
+        #region Events
+
+        protected delegate void Cmr1EventHandler();
+        protected event Cmr1EventHandler OnCmr1Change;
+        
+        #endregion
+        
         protected MemoryQuorum(
             string romSetName,
             int romPageCount,
@@ -63,6 +72,7 @@ namespace ZXMAK2.Hardware.Quorum
         {
             //LogAgent.Info("PC: #{0:X4}  CMR1 <- #{1:X2}", m_cpu.regs.PC, value);
             CMR1 = value;
+            OnCmr1Change?.Invoke();
         }
 
         protected virtual void BusReadMem3DXX_M1(ushort addr, ref byte value)
@@ -86,6 +96,7 @@ namespace ZXMAK2.Hardware.Quorum
             DOSEN = false;
             CMR0 = 0;
             CMR1 = 0;
+            OnCmr1Change?.Invoke();
         }
 
         protected virtual void BusNmiRq(BusCancelArgs e)
@@ -96,6 +107,7 @@ namespace ZXMAK2.Hardware.Quorum
         protected virtual void BusNmiAck()
         {
             CMR1 = 0x00;
+            OnCmr1Change?.Invoke();
         }
 
         #endregion

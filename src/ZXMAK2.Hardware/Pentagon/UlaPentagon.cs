@@ -8,9 +8,10 @@ namespace ZXMAK2.Hardware.Pentagon
         {
             Name = "Pentagon";
         }
+
+        protected override SpectrumRendererParams CreateSpectrumRendererParams() => GetTimings();
         
-        
-        protected override SpectrumRendererParams CreateSpectrumRendererParams()
+        public static SpectrumRendererParams GetTimings()
         {
             // Pentagon 128K
             // Total Size:          448 x 320
